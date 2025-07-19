@@ -1,20 +1,21 @@
 from flask import Flask, request, send_file
+from werkzeug.middleware.proxy_fix import ProxyFix
 from datetime import datetime
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1)
 
 @app.route('/track.png')
 def track():
-    # Obtener la IP real del cliente
-    real_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    # Ahora sí, request.remote_addr tiene la IP real del cliente
+    real_ip = request.remote_addr
+    user_agent = request.headers.get('User-Agent')
 
-    # Log del acceso
     with open("access.log", "a") as f:
-        f.write(f"[{datetime.now()}] IP: {real_ip}, UA: {request.headers.get('User-Agent')}\n")
+        f.write(f"[{datetime.now()}] IP: {real_ip}, UA: {user_agent}\n")
 
     return send_file("1x1.png", mimetype='image/png')
 
-# Opcional: para ver logs desde el navegador
 @app.route('/logs')
 def logs():
     with open("access.log", "r") as f:
