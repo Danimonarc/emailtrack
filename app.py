@@ -7,4 +7,4 @@ app = Flask(__name__)
 def track():
     with open("access.log", "a") as f:
         f.write(f"[{datetime.now()}] IP: {request.remote_addr}, UA: {request.headers.get('User-Agent')}\n")
-    return send_file("pixel.png", mimetype='image/png')
+    return send_file("1x1.png", mimetype='image/png')
